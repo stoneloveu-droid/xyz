@@ -1,10 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-  <title>Trang web của Phúc</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio của Phúc</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    section {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    .app-card {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .app-card h3 {
+      margin-top: 0;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: #ddd;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Chào mừng đến với trang web của tôi!</h1>
-  <p>Đây là trang đầu tiên tôi tự làm bằng HTML.</p>
+
+  <header>
+    <h1>Xin chào, mình là Phúc 👋</h1>
+    <p>Đây là portfolio cá nhân của mình — nơi mình chia sẻ các ứng dụng và dự án đã làm.</p>
+  </header>
+
+  <section>
+    <h2>🛠 Ứng dụng cá nhân</h2>
+
+    <div class="app-card">
+      <h3>Ứng dụng Quản lý Chi tiêu</h3>
+      <p>Giúp bạn ghi lại thu chi hàng ngày, thống kê theo tuần/tháng. Viết bằng React + Firebase.</p>
+      <a href="#">Xem chi tiết</a>
+    </div>
+
+    <div class="app-card">
+      <h3>Ứng dụng Ghi chú đơn giản</h3>
+      <p>Giao diện nhẹ, lưu ghi chú vào trình duyệt. Viết bằng HTML/CSS/JS thuần.</p>
+      <a href="#">Xem chi tiết</a>
+    </div>
+
+    <div class="app-card">
+      <h3>Ứng dụng Đếm thời gian Pomodoro</h3>
+      <p>Hỗ trợ làm việc tập trung theo chu kỳ 25 phút. Có âm báo và thống kê thời gian.</p>
+      <a href="#">Xem chi tiết</a>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Phúc | Liên hệ: phuc@example.com
+  </footer>
+
 </body>
 </html>
