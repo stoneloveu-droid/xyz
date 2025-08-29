@@ -1,0 +1,293 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Thời Gian Khai Triển 2D Nội Thất</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        *,::before,::after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}body{margin:0;font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.min-h-screen{min-height:100vh}.flex{display:flex}.items-center{align-items:center}.justify-center{justify-content:center}.max-w-lg{max-width:28rem}.mx-auto{margin-left:auto;margin-right:auto}.p-6{padding:1.5rem}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.bg-white{background-color:#fff}.rounded-lg{border-radius:.5rem}.shadow-md{box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px-2px rgba(0,0,0,.1)}.text-2xl{font-size:1.5rem;line-height:2rem}.font-bold{font-weight:700}.text-white{color:#fff}.text-sm{font-size:.875rem;line-height:1.25rem}.font-semibold{font-weight:600}.block{display:block}.mt-1{margin-top:.25rem}.w-full{width:100%}.border-gray-300{border-color:#d1d5db}.rounded-md{border-radius:.375rem}.transition{transition-property:color,background-color,border-color,opacity,box-shadow,transform;transition-duration:.15s}.bg-blue-500{background-color:#3b82f6}.hover\:bg-blue-600:hover{background-color:#1e3a8a}.p-2{padding:.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.gap-4{gap:1rem}.flex-wrap{flex-wrap:wrap}.hidden{display:none}.inline-flex{display:inline-flex}.items-baseline{align-items:baseline}.ml-2{margin-left:.5rem}.text-gray-600{color:#4b5563}
+        body {
+            background-image: linear-gradient(to bottom right, #f1f5f9, #e2e8f0);
+        }
+        .container {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,.1);
+        }
+        .header {
+            background: linear-gradient(to right, #3b82f6, #1e3a8a);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 1rem 1rem 0 0;
+            text-align: center;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .input-field, select, input[type="number"] {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+        .input-field:focus, select:focus, input[type="number"]:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .export-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: background 0.3s;
+        }
+        .export-btn:hover {
+            background: #1e3a8a;
+        }
+        .export-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+        .result-box {
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="container max-w-lg mx-auto p-6">
+        <div class="header">
+            <h1 class="text-2xl font-bold">Thời Gian Khai Triển 2D</h1>
+        </div>
+        <form id="timelineForm" class="p-6 space-y-4">
+            <div>
+                <label class="form-label block text-sm">Loại công trình</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="projectType" id="apartment" value="apartment"> Căn hộ</label>
+                    <label><input type="checkbox" name="projectType" id="townhouse" value="townhouse"> Nhà phố</label>
+                    <label><input type="checkbox" name="projectType" id="villa" value="villa"> Biệt thự</label>
+                    <label><input type="checkbox" name="projectType" id="service" value="service"> Dịch vụ (spa, quán ăn...)</label>
+                </div>
+            </div>
+            <div id="floorSection" class="hidden">
+                <label class="form-label block text-sm">Số tầng thiết kế</label>
+                <input type="number" id="floors" class="input-field mt-1" min="1" step="1" value="1" required>
+                <label class="form-label block text-sm mt-4">Diện tích mỗi tầng (m²)</label>
+                <div class="inline-flex items-baseline">
+                    <input type="number" id="floorArea" class="input-field mt-1" min="30" max="500" step="0.1" value="30" required>
+                    <span id="totalArea" class="ml-2 text-sm text-gray-600">Tổng: 30 m²</span>
+                </div>
+            </div>
+            <div>
+                <label class="form-label block text-sm">Phong cách thiết kế</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="designStyle" id="modern" value="modern"> Hiện đại</label>
+                    <label><input type="checkbox" name="designStyle" id="classic" value="classic"> Bán cổ điển</label>
+                    <label><input type="checkbox" name="designStyle" id="otherStyle" value="other"> Khác</label>
+                </div>
+            </div>
+            <div>
+                <label class="form-label block text-sm">Phạm vi công việc</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="fitout" value="fitout"> Fitout</label>
+                    <label><input type="checkbox" id="furCad" value="furCad"> Fur (Cad)</label>
+                    <label><input type="checkbox" id="furSketchup" value="furSketchup"> Fur (Sketchup)</label>
+                </div>
+            </div>
+            <button type="button" id="exportBtn" class="export-btn w-full" disabled>Xuất File Hình</button>
+        </form>
+        <div id="result" class="result-box"></div>
+    </div>
+
+    <script>
+        // Chỉ cho phép một checkbox trong mỗi nhóm
+        function enforceSingleCheckbox(groupName) {
+            const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        checkboxes.forEach(cb => {
+                            if (cb !== this) cb.checked = false;
+                        });
+                    }
+                    calculateTimeline();
+                });
+            });
+        }
+
+        // Áp dụng cho các nhóm checkbox
+        enforceSingleCheckbox('projectType');
+        enforceSingleCheckbox('designStyle');
+
+        // Hiển thị/ẩn trường số tầng và diện tích
+        const projectTypeCheckboxes = document.querySelectorAll('input[name="projectType"]');
+        const floorSection = document.getElementById('floorSection');
+        projectTypeCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const isApartment = document.getElementById('apartment').checked;
+                floorSection.classList.toggle('hidden', !Array.from(projectTypeCheckboxes).some(cb => cb.checked));
+                if (isApartment) {
+                    document.getElementById('floors').value = 1;
+                    document.getElementById('floors').disabled = true;
+                } else {
+                    document.getElementById('floors').disabled = false;
+                }
+                updateTotalArea();
+                calculateTimeline();
+            });
+        });
+
+        // Cập nhật diện tích tổng
+        function updateTotalArea() {
+            const floors = parseInt(document.getElementById('floors').value) || 1;
+            const floorArea = parseFloat(document.getElementById('floorArea').value) || 30;
+            const totalArea = floors * floorArea;
+            document.getElementById('totalArea').textContent = `Tổng: ${totalArea.toFixed(1)} m²`;
+        }
+
+        // Tính thời gian triển khai
+        function calculateTimeline() {
+            const projectType = ['apartment', 'townhouse', 'villa', 'service'].find(id => document.getElementById(id).checked) || 'apartment';
+            const floors = projectType === 'apartment' ? 1 : parseInt(document.getElementById('floors').value) || 1;
+            const floorArea = parseFloat(document.getElementById('floorArea').value) || 30;
+            const designStyle = ['modern', 'classic', 'otherStyle'].find(id => document.getElementById(id).checked) || 'modern';
+            const fitout = document.getElementById('fitout').checked;
+            const furCad = document.getElementById('furCad').checked;
+            const furSketchup = document.getElementById('furSketchup').checked;
+
+            // Kiểm tra dữ liệu hợp lệ
+            if (!fitout && !furCad && !furSketchup) {
+                document.getElementById('result').textContent = 'Vui lòng chọn ít nhất một phạm vi công việc (Fitout, Fur Cad, Fur Sketchup)';
+                document.getElementById('exportBtn').disabled = true;
+                return;
+            }
+            if (floorArea < 30 || floorArea > 500 || isNaN(floorArea)) {
+                document.getElementById('result').textContent = 'Diện tích mỗi tầng phải từ 30 đến 500 m²';
+                document.getElementById('exportBtn').disabled = true;
+                return;
+            }
+            if (floors < 1 || isNaN(floors)) {
+                document.getElementById('result').textContent = 'Số tầng phải lớn hơn hoặc bằng 1';
+                document.getElementById('exportBtn').disabled = true;
+                return;
+            }
+
+            // Effort cơ bản theo loại công trình
+            let effortBase = 0.05; // Căn hộ: 20 m²/ngày
+            if (projectType === 'townhouse') effortBase = 0.0455; // Nhà phố: 22 m²/ngày
+            else if (projectType === 'villa') effortBase = 0.0555; // Biệt thự: 18 m²/ngày
+            else if (projectType === 'service') effortBase = 0.0555; // Dịch vụ: 18 m²/ngày
+
+            // Hệ số điều chỉnh
+            let factorStyle = (designStyle === 'modern') ? 1 : 1.2;
+            let factorScope = 0;
+            if (fitout) factorScope += 1;
+            if (furCad) factorScope += 0.8;
+            if (furSketchup) factorScope += 0.8;
+
+            // Tính diện tích có giảm effort cho tầng lặp
+            let totalArea = 0;
+            for (let i = 0; i < floors; i++) {
+                totalArea += floorArea * (i === 0 ? 1 : 0.7);
+            }
+
+            // Tính ngày làm việc
+            let totalDays = totalArea * effortBase * factorStyle * factorScope;
+            let estimatedDays = Math.round(totalDays * 10) / 10;
+
+            // Hiển thị kết quả
+            document.getElementById('result').textContent = `Thời gian dự kiến: ${estimatedDays} ngày`;
+            document.getElementById('exportBtn').disabled = false;
+        }
+
+        // Sự kiện cập nhật real-time
+        document.getElementById('floors').addEventListener('input', () => {
+            updateTotalArea();
+            calculateTimeline();
+        });
+        document.getElementById('floorArea').addEventListener('input', () => {
+            updateTotalArea();
+            calculateTimeline();
+        });
+        document.getElementById('fitout').addEventListener('change', calculateTimeline);
+        document.getElementById('furCad').addEventListener('change', calculateTimeline);
+        document.getElementById('furSketchup').addEventListener('change', calculateTimeline);
+
+        // Xuất file hình
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const containerElement = document.querySelector('.container');
+            const projectType = ['apartment', 'townhouse', 'villa', 'service'].find(id => document.getElementById(id).checked) || 'apartment';
+            const projectTypeCapitalized = projectType.charAt(0).toUpperCase() + projectType.slice(1);
+            html2canvas(containerElement, {
+                backgroundColor: '#fff',
+                scale: 2,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `Timeline_2D_${projectTypeCapitalized}.png`;
+                link.click();
+            }).catch(err => {
+                console.error('Lỗi xuất hình:', err);
+                alert('Không thể xuất file hình. Vui lòng thử lại.');
+            });
+        });
+
+        // Khởi tạo
+        updateTotalArea();
+        calculateTimeline();
+    </script>
+</body>
+</html>
